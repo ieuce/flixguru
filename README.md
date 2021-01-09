@@ -1,2 +1,2 @@
 # suggest2me
-Personalized Recommender Engine
+Personalized Movie Recommender Engine
