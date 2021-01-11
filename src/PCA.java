@@ -120,7 +120,7 @@ public class PCA {
             covariance_matrix = add(covariance_matrix, dot(reshape(subtract(X[i], meanFeat), false), reshape(subtract(X[i], meanFeat), true)));
         }
 
-        covariance_matrix = divide(covariance_matrix, X.length-1)
+        covariance_matrix = divide(covariance_matrix, X.length-1);
         return  covariance_matrix;
     }
 
