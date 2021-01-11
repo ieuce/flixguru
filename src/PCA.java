@@ -98,6 +98,19 @@ public class PCA {
         return addResult;
     }
 
+    // Divide 2D array elements by specified integer
+    public Float[][] divide(Float[][] X, int N){
+        Float[][] divResult = new Float[X.length][X[0].length];
+
+        for(int i=0; i<X.length; i++){
+            for(int j=0; j<X[0].length; j++){
+                divResult[i][j] = (float) X[i][j] / N;
+            }
+        }
+
+        return divResult;
+    }
+
     public Float[][] covMatrix(Float[][] X){
 
         Float[][] covariance_matrix = new Float[X[0].length][X[0].length];
@@ -107,6 +120,7 @@ public class PCA {
             covariance_matrix = add(covariance_matrix, dot(reshape(subtract(X[i], meanFeat), false), reshape(subtract(X[i], meanFeat), true)));
         }
 
+        covariance_matrix = divide(covariance_matrix, X.length-1)
         return  covariance_matrix;
     }
 
