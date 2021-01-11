@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.FileReader;
@@ -15,7 +16,7 @@ public class Main {
 
         Map<Integer, String> movie_map = new HashMap<Integer, String>();
         Map<Integer, String> all_genome_map = new HashMap<Integer, String>();
-        Map<Integer, double[]> movieGenomeScore_map = new HashMap<Integer, double[]>();
+        Map<Integer, Float[]> movieGenomeScore_map = new HashMap<Integer, Float[]>();
 
         // Movies Data Frame
         try {
@@ -56,19 +57,34 @@ public class Main {
             String[] metadata = line.split(",");
 
             int row_counter = 0;
-            double[] genomeTagScores = new double[all_genome_map.size()];
+            Float[] genomeTagScores = new Float[all_genome_map.size()];
             while ((line = genome_scores_df.readLine()) != null) {
                 if((row_counter % all_genome_map.size() == 0) && (row_counter != 0)){
                     movieGenomeScore_map.put(Integer.parseInt(metadata[0]), genomeTagScores);
-                    genomeTagScores = new double[all_genome_map.size()];
+                    genomeTagScores = new Float[all_genome_map.size()];
                 }
                 metadata = line.split(",");
-                genomeTagScores[row_counter % all_genome_map.size()] = Double.parseDouble(metadata[2]);
+                genomeTagScores[row_counter % all_genome_map.size()] = Float.parseFloat(metadata[2]);
                 row_counter++;
             }
         }catch (IOException e){
             e.printStackTrace();
         }
+
+
+        /*
+        // Test Covariance Matrix (PCA.covMatrix()) Method
+        Float[][] encodings = new Float[movieGenomeScore_map.keySet().size()][];
+
+        int ith = 0;
+        for(Float[] encoding: movieGenomeScore_map.values()){
+            encodings[ith] = encoding;
+            ith++;
+        }
+
+        Float[][] covMatrix_data = PCA.covMatrix(encodings);
+        System.out.println(Arrays.toString(covMatrix_data[0]));
+        */
 
     }
 }

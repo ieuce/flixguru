@@ -1,10 +1,19 @@
+import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
+import org.apache.commons.math3.analysis.solvers.LaguerreSolver;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+
+import static symjava.symbolic.Symbol.*;
+import symjava.relational.Eq;
+import symjava.symbolic.*;
 
 public class PCA {
 
     // Vertical (denotes Features) Means of Input 2D Array
-    public Float[] meanVertical(Float[][] X){
+    public static Float[] meanVertical(Float[][] X){
         List<Float> meanList = new ArrayList<Float>();
 
         for(int i=0; i<X[0].length; i++){
@@ -22,7 +31,7 @@ public class PCA {
     }
 
     // Subtract two 1D array with same shapes
-    public Float[] subtract(Float[] x1, Float[] x2){
+    public static Float[] subtract(Float[] x1, Float[] x2){
         assert x1.length!=x2.length : "Mismatched Dimension Sizes";
 
         Float[] subResult = new Float[x1.length];
@@ -35,7 +44,7 @@ public class PCA {
     }
 
     // Reshape 1d array (n) -> if firstAxis return (1,n), else return (n,1)
-    public Float[][] reshape(Float[] X, boolean firstAxis){
+    public static Float[][] reshape(Float[] X, boolean firstAxis){
         Float[][] transposedX;
 
         if(firstAxis){
@@ -57,7 +66,7 @@ public class PCA {
     }
 
     // Apply Dot-Product to two arrays
-    public Float[][] dot(Float[][] x1, Float[][] x2){
+    public static Float[][] dot(Float[][] x1, Float[][] x2){
         assert x1[0].length != x2.length : "Mismatched Dimension Sizes";
         int common_dim_size = x1[0].length;
 
@@ -83,7 +92,7 @@ public class PCA {
     }
 
     // Add two 2D array
-    public Float[][] add(Float[][] x1, Float[][] x2){
+    public static Float[][] add(Float[][] x1, Float[][] x2){
         assert x1.length != x2.length : "Mismatched Dimension Sizes in axis=0";
         assert x1[0].length != x2[0].length : "Mismatched Dimension Sizes in axis=1";
 
@@ -99,7 +108,7 @@ public class PCA {
     }
 
     // Divide 2D array elements by specified integer
-    public Float[][] divide(Float[][] X, int N){
+    public static Float[][] divide(Float[][] X, int N){
         Float[][] divResult = new Float[X.length][X[0].length];
 
         for(int i=0; i<X.length; i++){
@@ -111,17 +120,38 @@ public class PCA {
         return divResult;
     }
 
-    public Float[][] covMatrix(Float[][] X){
+    // Create nxm sized 2D array with filled zeros
+    public static Float[][] createZeros2D(int n, int m){
+        Float[][] X = new Float[n][m];
 
-        Float[][] covariance_matrix = new Float[X[0].length][X[0].length];
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                X[i][j] = Float.valueOf(0);
+            }
+        }
+
+        return X;
+    }
+
+    public static Float[][] covMatrix(Float[][] X){
+
+        Float[][] covariance_matrix = createZeros2D(X[0].length, X[0].length);
         Float[] meanFeat = meanVertical(X);
 
         for(int i=0; i<X.length; i++){
             covariance_matrix = add(covariance_matrix, dot(reshape(subtract(X[i], meanFeat), false), reshape(subtract(X[i], meanFeat), true)));
         }
-
         covariance_matrix = divide(covariance_matrix, X.length-1);
-        return  covariance_matrix;
+
+        return covariance_matrix;
     }
+    /*
+    public HashMap<Float[], Float[]> eig(Float[][] X){
+        PolynomialFunction polynomial = new PolynomialFunction(new double[]{ -4, 3, 1});
+        LaguerreSolver laguerreSolver = new LaguerreSolver();
+        double root = laguerreSolver.solve(100, polynomial, -100, 100);
+        System.out.println("root = " + root);
+    }
+    */
 
 }
