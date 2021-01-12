@@ -38,7 +38,7 @@ public class PCA {
     }
 
     // Reshape 1d array (n) -> if firstAxis return (1,n), else return (n,1)
-    public static double[][] reshape(double[] X, boolean firstAxis){
+    public static double[][] expand_dims(double[] X, boolean firstAxis){
         double[][] transposedX;
 
         if(firstAxis){
@@ -126,7 +126,7 @@ public class PCA {
     }
 
     // Transpose 2D array
-    public static double[][] transpose(double[][] X){
+    private static double[][] transpose(double[][] X){
         double[][] X_transposed = new double[X[0].length][X.length];
 
         for(int i=0; i<X.length; i++){
@@ -144,7 +144,7 @@ public class PCA {
         double[] meanFeat = meanVertical(X);
 
         for(int i=0; i<X.length; i++){
-            covariance_matrix = add(covariance_matrix, dot(reshape(subtract(X[i], meanFeat), false), reshape(subtract(X[i], meanFeat), true)));
+            covariance_matrix = add(covariance_matrix, dot(expand_dims(subtract(X[i], meanFeat), false), expand_dims(subtract(X[i], meanFeat), true)));
         }
         covariance_matrix = divide(covariance_matrix, X.length-1);
 

@@ -80,11 +80,11 @@ public class Main {
         }
 
         PCA.fit(encodings, n_components);
-        double[][] transformed_encodings1 = PCA.transform(PCA.reshape(movieGenomeScore_map.get(4), true)); //4,Waiting to Exhale (1995),Comedy|Drama|Romance
+        double[][] transformed_encodings1 = PCA.transform(PCA.expand_dims(movieGenomeScore_map.get(4), true)); //4,Waiting to Exhale (1995),Comedy|Drama|Romance
         System.out.println(ArrayUtils.toString(transformed_encodings1[0]));
-        double[][] transformed_encodings2 = PCA.transform(PCA.reshape(movieGenomeScore_map.get(11), true)); // 11,"American President, The (1995)",Comedy|Drama|Romance
+        double[][] transformed_encodings2 = PCA.transform(PCA.expand_dims(movieGenomeScore_map.get(11), true)); // 11,"American President, The (1995)",Comedy|Drama|Romance
         System.out.println(ArrayUtils.toString(transformed_encodings2[0]));
-        double[][] transformed_encodings3 = PCA.transform(PCA.reshape(movieGenomeScore_map.get(2), true)); // 2,Jumanji (1995),Adventure|Children|Fantasy
+        double[][] transformed_encodings3 = PCA.transform(PCA.expand_dims(movieGenomeScore_map.get(2), true)); // 2,Jumanji (1995),Adventure|Children|Fantasy
         System.out.println(ArrayUtils.toString(transformed_encodings3[0]));
 
         double pos_dist = Math.pow(Math.pow(transformed_encodings1[0][0]-transformed_encodings2[0][0], 2) + Math.pow(transformed_encodings1[0][1]-transformed_encodings2[0][1], 2), 0.5);
