@@ -35,4 +35,6 @@ public class User {
         _locYu = weighted_sumY;
     }
 
+
+
 }

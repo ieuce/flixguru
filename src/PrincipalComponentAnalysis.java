@@ -3,9 +3,15 @@ import org.apache.commons.math3.linear.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PCA {
+public class PrincipalComponentAnalysis {
     private static boolean _fitted = false;
     private static double[][] _eigenVectors;
+    private static int _n_components;
+
+    public PrincipalComponentAnalysis(int n_components){
+        assert n_components >= 1 : "n_components should be equals or greater than 1";
+        _n_components = n_components;
+    }
 
     // Vertical (denotes Features) Means of Input 2D Array
     private static double[] meanVertical(double[][] X){
@@ -177,25 +183,21 @@ public class PCA {
     }
 
     public static double[][] transform(double[][] X) {
-        assert _fitted : "Before transformation of data, apply fit method -> PCA.fit(...);";
+        assert _fitted : "Before transformation of data, apply fit method -> fit(...);";
 
         return dot(X, _eigenVectors);
     }
 
-    public static void fit(double[][] Xencodings, int n_components){
-        assert n_components >= 1 : "n_components should be equals or greater than 1";
-
+    public static void fit(double[][] Xencodings){
         double[][] covMatrix_data = covMatrix(Xencodings);
-        eig(covMatrix_data, n_components);
+        eig(covMatrix_data, _n_components);
 
         _fitted = true;
     }
 
-    public static double[][] fit_transform(double[][] Xencodings, int n_components){
-        assert n_components >= 1 : "n_components should be equals or greater than 1";
-
+    public static double[][] fit_transform(double[][] Xencodings){
         double[][] covMatrix_data = covMatrix(Xencodings);
-        eig(covMatrix_data, n_components);
+        eig(covMatrix_data, _n_components);
 
         _fitted = true;
 
