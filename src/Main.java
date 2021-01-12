@@ -1,4 +1,7 @@
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.FileReader;
@@ -8,6 +11,7 @@ import java.io.BufferedReader;
 public class Main {
     public static void main(String[] args) {
         String line;
+        final int n_components = 2;
 
         String data_dir = "F:\\PROJECTS\\PROCESSING\\suggest2me\\data\\ml-25m\\";
         String movies_path = data_dir+"movies.csv";
@@ -16,7 +20,7 @@ public class Main {
 
         Map<Integer, String> movie_map = new HashMap<Integer, String>();
         Map<Integer, String> all_genome_map = new HashMap<Integer, String>();
-        Map<Integer, Float[]> movieGenomeScore_map = new HashMap<Integer, Float[]>();
+        Map<Integer, double[]> movieGenomeScore_map = new HashMap<Integer, double[]>();
 
         // Movies Data Frame
         try {
@@ -57,34 +61,30 @@ public class Main {
             String[] metadata = line.split(",");
 
             int row_counter = 0;
-            Float[] genomeTagScores = new Float[all_genome_map.size()];
+            double[] genomeTagScores = new double[all_genome_map.size()];
             while ((line = genome_scores_df.readLine()) != null) {
                 if((row_counter % all_genome_map.size() == 0) && (row_counter != 0)){
                     movieGenomeScore_map.put(Integer.parseInt(metadata[0]), genomeTagScores);
-                    genomeTagScores = new Float[all_genome_map.size()];
+                    genomeTagScores = new double[all_genome_map.size()];
                 }
                 metadata = line.split(",");
-                genomeTagScores[row_counter % all_genome_map.size()] = Float.parseFloat(metadata[2]);
+                genomeTagScores[row_counter % all_genome_map.size()] = Double.parseDouble(metadata[2]);
                 row_counter++;
             }
         }catch (IOException e){
             e.printStackTrace();
         }
 
-
-        /*
-        // Test Covariance Matrix (PCA.covMatrix()) Method
-        Float[][] encodings = new Float[movieGenomeScore_map.keySet().size()][];
+        // Test PCA
+        double[][] encodings = new double[movieGenomeScore_map.keySet().size()][];
 
         int ith = 0;
-        for(Float[] encoding: movieGenomeScore_map.values()){
+        for(double[] encoding: movieGenomeScore_map.values()){
             encodings[ith] = encoding;
             ith++;
         }
 
-        Float[][] covMatrix_data = PCA.covMatrix(encodings);
-        System.out.println(Arrays.toString(covMatrix_data[0]));
-        */
-
+        double[][] transformed_encodings = PCA.fit_transform(encodings, n_components);
+        System.out.println(transformed_encodings.length +"x"+ transformed_encodings[0].length);
     }
 }
