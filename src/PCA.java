@@ -38,7 +38,7 @@ public class PCA {
     }
 
     // Reshape 1d array (n) -> if firstAxis return (1,n), else return (n,1)
-    private static double[][] reshape(double[] X, boolean firstAxis){
+    public static double[][] reshape(double[] X, boolean firstAxis){
         double[][] transposedX;
 
         if(firstAxis){
@@ -126,7 +126,7 @@ public class PCA {
     }
 
     // Transpose 2D array
-    private static double[][] transpose(double[][] X){
+    public static double[][] transpose(double[][] X){
         double[][] X_transposed = new double[X[0].length][X.length];
 
         for(int i=0; i<X.length; i++){
@@ -179,7 +179,7 @@ public class PCA {
     public static double[][] transform(double[][] X) {
         assert _fitted : "Before transformation of data, apply fit method -> PCA.fit(...);";
 
-        return dot(transpose(_eigenVectors), X);
+        return dot(X, _eigenVectors);
     }
 
     public static void fit(double[][] Xencodings, int n_components){

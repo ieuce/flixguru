@@ -1,12 +1,7 @@
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.BufferedReader;
+import java.io.*;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,9 +13,9 @@ public class Main {
         String genome_tags_path = data_dir+"genome-tags.csv";
         String genome_scores_path = data_dir+"genome-scores.csv";
 
-        Map<Integer, String> movie_map = new HashMap<Integer, String>();
-        Map<Integer, String> all_genome_map = new HashMap<Integer, String>();
-        Map<Integer, double[]> movieGenomeScore_map = new HashMap<Integer, double[]>();
+        Map<Integer, String> movie_map = new LinkedHashMap<Integer, String>();
+        Map<Integer, String> all_genome_map = new LinkedHashMap<Integer, String>();
+        Map<Integer, double[]> movieGenomeScore_map = new LinkedHashMap<Integer, double[]>();
 
         // Movies Data Frame
         try {
@@ -63,7 +58,7 @@ public class Main {
             int row_counter = 0;
             double[] genomeTagScores = new double[all_genome_map.size()];
             while ((line = genome_scores_df.readLine()) != null) {
-                if((row_counter % all_genome_map.size() == 0) && (row_counter != 0)){
+                if((row_counter % all_genome_map.size() == all_genome_map.size()-1)){
                     movieGenomeScore_map.put(Integer.parseInt(metadata[0]), genomeTagScores);
                     genomeTagScores = new double[all_genome_map.size()];
                 }
@@ -79,12 +74,24 @@ public class Main {
         double[][] encodings = new double[movieGenomeScore_map.keySet().size()][];
 
         int ith = 0;
-        for(double[] encoding: movieGenomeScore_map.values()){
-            encodings[ith] = encoding;
+        for(int key: movieGenomeScore_map.keySet()){
+            encodings[ith] = movieGenomeScore_map.get(key);
             ith++;
         }
 
-        double[][] transformed_encodings = PCA.fit_transform(encodings, n_components);
-        System.out.println(transformed_encodings.length +"x"+ transformed_encodings[0].length);
+        PCA.fit(encodings, n_components);
+        double[][] transformed_encodings1 = PCA.transform(PCA.reshape(movieGenomeScore_map.get(4), true)); //4,Waiting to Exhale (1995),Comedy|Drama|Romance
+        System.out.println(ArrayUtils.toString(transformed_encodings1[0]));
+        double[][] transformed_encodings2 = PCA.transform(PCA.reshape(movieGenomeScore_map.get(11), true)); // 11,"American President, The (1995)",Comedy|Drama|Romance
+        System.out.println(ArrayUtils.toString(transformed_encodings2[0]));
+        double[][] transformed_encodings3 = PCA.transform(PCA.reshape(movieGenomeScore_map.get(2), true)); // 2,Jumanji (1995),Adventure|Children|Fantasy
+        System.out.println(ArrayUtils.toString(transformed_encodings3[0]));
+
+        double pos_dist = Math.pow(Math.pow(transformed_encodings1[0][0]-transformed_encodings2[0][0], 2) + Math.pow(transformed_encodings1[0][1]-transformed_encodings2[0][1], 2), 0.5);
+        System.out.println("positive distance 4-11: " + pos_dist);
+
+        double neg_dist = Math.pow(Math.pow(transformed_encodings1[0][0]-transformed_encodings3[0][0], 2) + Math.pow(transformed_encodings1[0][1]-transformed_encodings3[0][1], 2), 0.5);
+        System.out.println("negative distance 2-4: " + neg_dist);
+
     }
 }
