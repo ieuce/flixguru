@@ -1,8 +1,70 @@
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class User {
+    private String _nickname;
+    private String _password;
+    private int _security_question_id;
+    private String _security_question_answer;
+
+    private Map<String, String> _login_credentials = new HashMap<String, String>();
+    private Map<Integer, String> _security_qa_map = new HashMap<Integer, String>();
+
+    private Map<Integer, Integer> _movieid_rates = new HashMap<Integer, Integer>();
+
     private static double _locXu;
     private static double _locYu;
+
+    public String get_nickname() {
+        return _nickname;
+    }
+    public void set_nickname(String _nickname) {
+        this._nickname = _nickname;
+    }
+
+    public String get_password() {
+        return _password;
+    }
+    public void set_password(String _password) {
+        this._password = _password;
+    }
+
+    public int get_security_question_id() {
+        return _security_question_id;
+    }
+    public void set_security_question_id(int _security_question_id) {
+        this._security_question_id = _security_question_id;
+    }
+
+    public String get_security_question_answer() {
+        return _security_question_answer;
+    }
+    public void set_security_question_answer(String _security_question_answer) {
+        this._security_question_answer = _security_question_answer;
+    }
+
+    public void match_credentials(){
+        _login_credentials.put(_nickname, _password);
+    }
+    public Map<String, String> get_login_credentials(){
+        return _login_credentials;
+    }
+
+    public void match_security_qa(){
+        _security_qa_map.put(_security_question_id, _security_question_answer);
+    }
+    public Map<Integer, String> get_security_qa_map() {
+        return _security_qa_map;
+    }
+
+    public void addMovieWRate(int movieID, int rate){
+        _movieid_rates.put(movieID, rate);
+    }
+    public Map<Integer, Integer> get_movieid_rates() {
+        return _movieid_rates;
+    }
 
     // Sum up 1D array
     private static double sum(double[] X){
@@ -34,7 +96,5 @@ public class User {
         _locXu = weighted_sumX;
         _locYu = weighted_sumY;
     }
-
-
 
 }
