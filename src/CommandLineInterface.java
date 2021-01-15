@@ -1,4 +1,3 @@
-import java.util.List;
 import java.util.Scanner;
 
 public class CommandLineInterface {
@@ -71,14 +70,14 @@ public class CommandLineInterface {
         System.out.printf("%s: ",Text);
     }
 
-    public static void QAMenu(String ChoiceText, int n_row_questions){
+    public static void QAMenu(String ChoiceText, String PrintedText, int n_row_questions){
         System.out.println("▚".repeat(_colMax));
         String menuString = "\n\n"+ANSI_RED+CoolTexts.centered_logo+ANSI_RESET+"\n";
         System.out.println(menuString);
         System.out.print("\n".repeat(8-n_row_questions));
         System.out.println(ChoiceText);
         System.out.println("▚".repeat(_colMax));
-        System.out.printf("Security Question ID: ");
+        System.out.printf(PrintedText);
     }
 
     public static void WriteSuccessMenu(String s, long time_in_milis){
@@ -123,24 +122,28 @@ public class CommandLineInterface {
         long timeinmilis = 5000;
         long timeinmilis_short = Math.round(timeinmilis/3);
 
+        String[] security_questions = {"(1) What is your elementary school teacher's name?","(2) What is your first pet's name?","(3) What is the name of your favorite childhood friend?"};
+        int n_questions = security_questions.length;
+
         Scanner input = new Scanner(System.in);
 
         WelcomeMenu(timeinmilis);
 
         int choice0;
         boolean looper0 = true;
+        boolean logged = false;
         while(looper0) {
             slideDown();
             LoginRegisterMenu();
             choice0 = input.nextInt();
             switch (choice0) {
                 case 1:
-                    String nickname;
-                    String password1, password2;
-                    int security_question_id;
-                    String security_question_answer;
-                    int rate;
-                    int[] to_be_rated_movies10 = {2959,7153,79132,356,109487,51167,6539,89745,74458,73881};
+                    String nickname_c1;
+                    String password1_c1, password2_c1;
+                    int security_question_id_c1;
+                    String security_question_answer_c1;
+                    int rate_c1;
+                    int[] to_be_rated_movies10_c1 = {2959,7153,79132,356,109487,51167,6539,89745,74458,73881};
 
                     User user = new User();
 
@@ -148,12 +151,12 @@ public class CommandLineInterface {
                     boolean looper1 = true;
                     while (looper1) {
                         GetInfoMenu("Nickname");
-                        nickname = input.next();
-                        if(accounts.contains_nickname(nickname)){
+                        nickname_c1 = input.next();
+                        if(accounts.contains_nickname(nickname_c1)){
                             slideDown();
                             WriteErrorMenu("Nickname Already Taken !!", timeinmilis_short);
                         } else{
-                            user.set_nickname(nickname);
+                            user.set_nickname(nickname_c1);
                             looper1 = false;
                         }
                         slideDown();
@@ -163,12 +166,12 @@ public class CommandLineInterface {
                     boolean looper3 = true;
                     while (looper3) {
                         GetInfoMenu("Password");
-                        password1 = input.next();
+                        password1_c1 = input.next();
                         slideDown();
                         GetInfoMenu("Verify password");
-                        password2 = input.next();
-                        if(password1.equals(password2)){
-                            user.set_password(password1);
+                        password2_c1 = input.next();
+                        if(password1_c1.equals(password2_c1)){
+                            user.set_password(password1_c1);
                             slideDown();
                             WriteSuccessMenu("Password verified!", timeinmilis_short);
                             looper3 = false;
@@ -181,18 +184,24 @@ public class CommandLineInterface {
                     user.match_credentials();
 
                     // Question ID
-                    String qa_menu = "(1) What is your elementary school teacher's name?\n(2) What is your first pet's name?\n(3) What is the name of your favorite childhood friend?";
-                    int n_questions = 3;
+                    StringBuilder qa_menu = new StringBuilder();
+                    for(int i=0; i<n_questions; i++){
+                        qa_menu.append(security_questions[i]);
+                        if(i != n_questions-1){
+                            qa_menu.append("\n");
+                        }
+                    }
+
                     boolean looper4 = true;
                     boolean valid_id = false;
                     while (looper4){
-                        QAMenu(qa_menu, n_questions);
-                        security_question_id = input.nextInt();
+                        QAMenu(qa_menu.toString(), "Security Question ID: ", n_questions);
+                        security_question_id_c1 = input.nextInt();
                         for(int i=1; i<=n_questions; i++){
-                            if(security_question_id == i){
+                            if(security_question_id_c1 == i){
                                 valid_id = true;
                                 looper4 = false;
-                                user.set_security_question_id(security_question_id);
+                                user.set_security_question_id(security_question_id_c1);
                             }
                         }
                         if(!valid_id){
@@ -204,27 +213,27 @@ public class CommandLineInterface {
 
                     // Answer
                     GetInfoMenu("Security Question Answer");
-                    security_question_answer = input.next();
-                    user.set_security_question_answer(security_question_answer);
+                    security_question_answer_c1 = input.next();
+                    user.set_security_question_answer(security_question_answer_c1);
                     user.match_security_qa();
                     slideDown();
 
                     // Ratings
                     String imdbID;
                     boolean looper5;
-                    for(int movie_id: to_be_rated_movies10){
+                    for(int movie_id: to_be_rated_movies10_c1){
                         looper5 = true;
                         while (looper5) {
                             imdbID = movie_info.get_imdbID(movie_id);
                             movie_info.displayMenu(imdbID);
-                            rate = input.nextInt();
+                            rate_c1 = input.nextInt();
 
-                            if((rate<0) || (rate>10)){
+                            if((rate_c1<0) || (rate_c1>10)){
                                 slideDown();
                                 invalidChoiceMenu(timeinmilis_short);
                             } else{
                                 looper5 = false;
-                                user.addMovieWRate(movie_id, rate);
+                                user.addMovieWRate(movie_id, rate_c1);
                             }
 
                             slideDown();
@@ -238,9 +247,62 @@ public class CommandLineInterface {
 
                     break;
                 case 2:
-                    System.out.println("Forwarding to login menu");
-                    GetInfoMenu("Username");
-                    GetInfoMenu("Password");
+                    String nickname_c2 = "q";
+                    String password_c2;
+                    String security_question_answer_c2;
+
+                    // Nickname
+                    boolean looper6 = true;
+                    while (looper6) {
+                        GetInfoMenu("Nickname");
+                        nickname_c2 = input.next();
+                        if(accounts.contains_nickname(nickname_c2)){
+                            looper6 = false;
+                        } else{
+                            slideDown();
+                            WriteErrorMenu("Invalid Nickname", timeinmilis_short);
+                        }
+                        slideDown();
+                    }
+
+                    // Password
+                    int wrong_pass_counter = 0;
+                    boolean looper7 = true;
+                    boolean security_qa = false;
+                    while (looper7) {
+                        if(wrong_pass_counter==3){
+                            WriteErrorMenu("Too many wrong attempts. Please answer the security question.", timeinmilis_short);
+                            security_qa = true;
+                            looper7 = false;
+                        } else {
+                            GetInfoMenu("Password");
+                            password_c2 = input.next();
+                            if (accounts.check_password(nickname_c2, password_c2)) {
+                                WriteSuccessMenu("You are logged!", timeinmilis_short);
+                                looper7 = false;
+                                logged = true;
+                            } else {
+                                wrong_pass_counter++;
+                                slideDown();
+                                WriteErrorMenu("Password is incorrect ! You have " + (3 - wrong_pass_counter) + " chance left", timeinmilis_short);
+                            }
+                            slideDown();
+                        }
+                    }
+
+                    // Security QA
+                    if(security_qa){
+                        int q_id = accounts.get_security_questionID(nickname_c2);
+                        QAMenu(security_questions[q_id-1], "Security Question Answer: ", 1);
+                        security_question_answer_c2 = input.next();
+                        if(accounts.check_security_qa(q_id, security_question_answer_c2)){
+                            logged = true;
+                            WriteSuccessMenu("You are logged", timeinmilis_short);
+                        } else {
+                            WriteErrorMenu("Login credentials are incorrect! Quit!", timeinmilis_short);
+                        }
+                    }
+
                     looper0 = false;
                     break;
                 default:

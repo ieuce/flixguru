@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Accounts {
     private List<User> _accounts = new ArrayList<User>();
@@ -10,6 +11,10 @@ public class Accounts {
 
     public boolean check_password(String nickname, String password){
         return _accounts.stream().map(User::get_login_credentials).filter(entry -> entry.containsKey(nickname)).map(entry -> entry.get(nickname)).anyMatch(password::equals);
+    }
+
+    public int get_security_questionID(String nickname){
+        return _accounts.stream().filter(entry -> entry.get_nickname().equals(nickname)).findFirst().map(User::get_security_question_id).get();
     }
 
     public boolean check_security_qa(int question_id, String answer){
