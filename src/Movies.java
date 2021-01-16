@@ -45,32 +45,37 @@ public class Movies {
 
         } catch (InterruptedException | IOException | ParseException e) {
             e.printStackTrace();
+        }catch (IndexOutOfBoundsException e){
+            _MOVIE_INFO = null;
         }
     }
 
     public void displayMenu(String imdbID){
         this.query(imdbID);
+        if(_MOVIE_INFO != null) {
+            String MovieCardRowString;
+            List<String> rows = new ArrayList<String>();
+            for (int i = 0; i < _KEYS.length; i++) {
+                MovieCardRowString = _PRINT_KEYS[i] + ": " + _MOVIE_INFO.get(_KEYS[i]);
+                Pattern p = Pattern.compile("\\G\\s*(.{1," + CommandLineInterface._colMax + "})(?=\\s|$)", Pattern.DOTALL);
+                Matcher m = p.matcher(MovieCardRowString);
 
-        String MovieCardRowString;
-        List<String> rows = new ArrayList<String>();
-        for(int i=0; i<_KEYS.length; i++){
-            MovieCardRowString = _PRINT_KEYS[i] + ": " + _MOVIE_INFO.get(_KEYS[i]);
-            Pattern p = Pattern.compile("\\G\\s*(.{1,"+CommandLineInterface._colMax+"})(?=\\s|$)", Pattern.DOTALL);
-            Matcher m = p.matcher(MovieCardRowString);
-
-            while (m.find()){
-                rows.add(m.group(1));
+                while (m.find()) {
+                    rows.add(m.group(1));
+                }
             }
-        }
 
-        String movie_card_string = "\tMOVIE CARD\t";
-        System.out.println(CommandLineInterface.ANSI_RED + CoolTexts.centered_logo_prettyside + CommandLineInterface.ANSI_RESET);
-        System.out.println("▚".repeat(Math.round((CommandLineInterface._colMax-movie_card_string.length())/2))+movie_card_string+"▚".repeat(Math.round((CommandLineInterface._colMax-movie_card_string.length())/2)));
-        for(String text: rows){
-            System.out.println(text);
+            String movie_card_string = "\tMOVIE CARD\t";
+            System.out.println(CommandLineInterface.ANSI_RED + CoolTexts.centered_logo_prettyside + CommandLineInterface.ANSI_RESET);
+            System.out.println("▚".repeat(Math.round((CommandLineInterface._colMax - movie_card_string.length()) / 2)) + movie_card_string + "▚".repeat(Math.round((CommandLineInterface._colMax - movie_card_string.length()) / 2)));
+            for (String text : rows) {
+                System.out.println(text);
+            }
+            System.out.println("▚".repeat(CommandLineInterface._colMax));
+            System.out.print("Rate (0-10): ");
+        }else{
+            CommandLineInterface.slideDown();
         }
-        System.out.println("▚".repeat(CommandLineInterface._colMax));
-        System.out.print("Rate (0-10): ");
     }
 
     public void set_movieId_imdbId(String linksCSV_path) {
