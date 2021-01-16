@@ -1,2 +1,2 @@
-# suggest2me
+# flixguru
 Personalized Movie Recommender Engine
