@@ -18,7 +18,7 @@ public class kNearestNeighbor {
     }
 
     // Calculate distances to User location in the projection map.
-    public static void fit(LinkedHashMap<Integer, double[]> X, double[] UserLoc){
+    public void fit(LinkedHashMap<Integer, double[]> X, double[] UserLoc){
         TreeMap<Double, Integer> sorted_dists = new TreeMap<Double, Integer>();
 
         for(int key: X.keySet()){
@@ -36,21 +36,23 @@ public class kNearestNeighbor {
 
 
     // Get v0'th to v1'th elements of Movie-Distance Map
-    public static int[] recommend(int v0, int v1){
+    public int[] recommend(int v0, int n_movie){
         assert _fitted : "Before recommendation, apply fit method -> fit(...);";
-        assert v0 < v1 : "First index value should less than second value";
         assert v0 >= 0 : "First index value can't be zero";
-        assert v1 <= _userMovieDistanceMap.size()-1 : "Max index value can't be greater than number of movie -1";
 
-        int n_movie = v1-v0+1;
         int[] movie_ids = new int[n_movie];
 
         int movie_counter = 0;
+        int movie_index = 0;
         for(int movie_id: _userMovieDistanceMap.keySet()){
-            movie_ids[movie_counter++] = movie_id;
-            if(movie_counter == n_movie){
-                break;
+            if(movie_index >= v0){
+                movie_ids[movie_counter++] = movie_id;
+                if(movie_counter == n_movie){
+                    break;
+                }
             }
+            movie_index++;
+
         }
 
         return movie_ids;
