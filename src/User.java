@@ -24,9 +24,6 @@ public class User {
         this._nickname = _nickname;
     }
 
-    public String get_password() {
-        return _password;
-    }
     public void set_password(String _password) {
         this._password = _password;
     }
@@ -67,7 +64,7 @@ public class User {
     }
 
     // Sum up 1D array
-    private static double sum(double[] X){
+    private double sum(int[] X){
         double sum = 0;
 
         for (double x : X) {
@@ -78,7 +75,7 @@ public class User {
     }
 
     // Localize user in transformed movies map
-    public static void localize(List<double[]> mlocs, double[] rates){
+    public void localize(List<double[]> mlocs, int[] rates){
         assert mlocs.size() == rates.length : "Number of movie positions and rates should be same";
 
         double weighted_sumX = 0;
@@ -95,6 +92,13 @@ public class User {
 
         _locXu = weighted_sumX;
         _locYu = weighted_sumY;
+    }
+
+    public double[] get_projected_location(){
+        double[] UserLoc = new double[2];
+        UserLoc[0] = _locXu;
+        UserLoc[1] = _locYu;
+        return UserLoc;
     }
 
 }
