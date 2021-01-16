@@ -1,4 +1,4 @@
-import java.util.Scanner;
+import java.util.*;
 
 public class CommandLineInterface {
     public static final String ANSI_RESET = "\u001B[0m";
@@ -22,6 +22,12 @@ public class CommandLineInterface {
     public static final int _rowMax = 20;
     public static final int _colMax = 127;
 
+    public static void slideDown() {
+        for (int row = 0; row < _rowMax; row++) {
+            System.out.println(" ".repeat(_colMax));
+        }
+    }
+
     public static void invalidChoiceMenu(long time_in_milis){
         System.out.println("▚".repeat(_colMax));
         String menuString = "\n\n\n\n"+ANSI_RED+CoolTexts.invalid_choice+ANSI_RESET+"\n\n\n\n\n";
@@ -32,12 +38,6 @@ public class CommandLineInterface {
             Thread.sleep(time_in_milis);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
-    }
-
-    public static void slideDown() {
-        for (int row = 0; row < _rowMax; row++) {
-            System.out.println(" ".repeat(_colMax));
         }
     }
 
@@ -68,6 +68,14 @@ public class CommandLineInterface {
         System.out.println(menuString);
         System.out.println("▚".repeat(_colMax));
         System.out.printf("%s: ",Text);
+    }
+
+    public static void WriteText(String Text){
+        System.out.println("▚".repeat(_colMax));
+        String menuString = "\n\n\n\n\n\n"+ANSI_RED+CoolTexts.centered_logo+ANSI_RESET+"\n\n\n\n\n";
+        System.out.println(menuString);
+        System.out.println("▚".repeat(_colMax));
+        System.out.print(Text);
     }
 
     public static void QAMenu(String ChoiceText, String PrintedText, int n_row_questions){
@@ -111,10 +119,17 @@ public class CommandLineInterface {
     }
 
     public static void main(String[] args){
+        final int n_components = 2;
+
         String data_dir = "F:\\PROJECTS\\PROCESSING\\suggest2me\\data\\ml-25m\\";
         String linksCSV_path = data_dir+"links.csv";
+        String genome_tags_path = data_dir+"genome-tags.csv";
+        String genome_scores_path = data_dir+"genome-scores.csv";
 
         Accounts accounts = new Accounts();
+        User user = new User();
+
+        Map<Integer, double[]> movieGenomeScore_map = Data.movieID_Encodings(genome_scores_path, genome_tags_path);
 
         Movies movie_info = new Movies("1801504cbd978f3bdb0ac97556f03dd9");
         movie_info.set_movieId_imdbId(linksCSV_path);
@@ -145,7 +160,7 @@ public class CommandLineInterface {
                     int rate_c1;
                     int[] to_be_rated_movies10_c1 = {2959,7153,79132,356,109487,51167,6539,89745,74458,73881};
 
-                    User user = new User();
+                    User register_user = new User();
 
                     // Nickname
                     boolean looper1 = true;
@@ -156,7 +171,7 @@ public class CommandLineInterface {
                             slideDown();
                             WriteErrorMenu("Nickname Already Taken !!", timeinmilis_short);
                         } else{
-                            user.set_nickname(nickname_c1);
+                            register_user.set_nickname(nickname_c1);
                             looper1 = false;
                         }
                         slideDown();
@@ -171,7 +186,7 @@ public class CommandLineInterface {
                         GetInfoMenu("Verify password");
                         password2_c1 = input.next();
                         if(password1_c1.equals(password2_c1)){
-                            user.set_password(password1_c1);
+                            register_user.set_password(password1_c1);
                             slideDown();
                             WriteSuccessMenu("Password verified!", timeinmilis_short);
                             looper3 = false;
@@ -181,7 +196,7 @@ public class CommandLineInterface {
                         }
                         slideDown();
                     }
-                    user.match_credentials();
+                    register_user.match_credentials();
 
                     // Question ID
                     StringBuilder qa_menu = new StringBuilder();
@@ -201,7 +216,7 @@ public class CommandLineInterface {
                             if(security_question_id_c1 == i){
                                 valid_id = true;
                                 looper4 = false;
-                                user.set_security_question_id(security_question_id_c1);
+                                register_user.set_security_question_id(security_question_id_c1);
                             }
                         }
                         if(!valid_id){
@@ -214,9 +229,9 @@ public class CommandLineInterface {
                     // Answer
                     GetInfoMenu("Security Question Answer");
                     security_question_answer_c1 = input.next();
-                    user.set_security_question_answer(security_question_answer_c1);
-                    user.match_security_qa();
-                    slideDown();
+                    register_user.set_security_question_answer(security_question_answer_c1);
+                    register_user.match_security_qa();
+                    System.out.println();
 
                     // Ratings
                     String imdbID;
@@ -233,15 +248,14 @@ public class CommandLineInterface {
                                 invalidChoiceMenu(timeinmilis_short);
                             } else{
                                 looper5 = false;
-                                user.addMovieWRate(movie_id, rate_c1);
+                                register_user.addMovieWRate(movie_id, rate_c1);
                             }
-
-                            slideDown();
                         }
+                        System.out.println();
                     }
 
                     // Register user
-                    accounts.addUser(user);
+                    accounts.addUser(register_user);
                     WriteSuccessMenu("Registration complete. Please login.", timeinmilis_short);
                     slideDown();
 
@@ -278,6 +292,7 @@ public class CommandLineInterface {
                             GetInfoMenu("Password");
                             password_c2 = input.next();
                             if (accounts.check_password(nickname_c2, password_c2)) {
+                                user = accounts.get_User(nickname_c2);
                                 WriteSuccessMenu("You are logged!", timeinmilis_short);
                                 looper7 = false;
                                 logged = true;
@@ -297,6 +312,7 @@ public class CommandLineInterface {
                         security_question_answer_c2 = input.next();
                         if(accounts.check_security_qa(q_id, security_question_answer_c2)){
                             logged = true;
+                            user = accounts.get_User(nickname_c2);
                             WriteSuccessMenu("You are logged", timeinmilis_short);
                         } else {
                             WriteErrorMenu("Login credentials are incorrect! Quit!", timeinmilis_short);
@@ -313,6 +329,66 @@ public class CommandLineInterface {
             }
         }
 
+        if(logged){
+            slideDown();
+            WriteText("You personal assistance flixguru is training. Please wait. This may take few minutes.");
 
+            // Prepare PCA
+            PrincipalComponentAnalysis pca = new PrincipalComponentAnalysis(n_components);
+            double[][] encodings = Data.get_encodings(genome_scores_path, genome_tags_path);
+            pca.fit(encodings);
+
+            slideDown();
+            WriteSuccessMenu("Training is finished.", timeinmilis);
+
+            // Recommendation
+            kNearestNeighbor knn = new kNearestNeighbor();
+
+            LinkedHashMap<Integer, double[]> movieID_encodings = new LinkedHashMap<Integer, double[]>();
+            for(int movieID: movieGenomeScore_map.keySet()){
+                movieID_encodings.put(movieID, pca.transform(pca.expand_dims(movieGenomeScore_map.get(movieID), true))[0]);
+            }
+
+
+            int recommended_movieId;
+            int choice;
+            boolean looper8 = true;
+            int movie_index = 10;
+            int counter = 0;
+            while (looper8){
+                if(counter % 10 == 0){
+                    // Localize User and Re-Calculate Distances
+                    Map<Integer, Integer> movieid_rates = user.get_movieid_rates();
+                    int[] rates              = new int[movieid_rates.keySet().size()];
+                    List<double[]> movieLocs = new ArrayList<double[]>();
+                    int c = 0;
+                    for(int movieID: movieid_rates.keySet()){
+                        rates[c++] = movieid_rates.get(movieID);
+                        movieLocs.add(pca.transform(pca.expand_dims(movieGenomeScore_map.get(movieID), true))[0]);
+                    }
+                    user.localize(movieLocs, rates);
+                    knn.fit(movieID_encodings, user.get_projected_location());
+                    movie_index = movieid_rates.keySet().size();
+                }
+
+                recommended_movieId = knn.recommend(movie_index++,1)[0];
+                movie_info.displayMenu(movie_info.get_imdbID(recommended_movieId));
+                System.out.print("[-1 to quit]: ");
+                choice = input.nextInt();
+                if(choice == -1){
+                    looper8 = false;
+                    WriteSuccessMenu("Quit", timeinmilis_short);
+                } else if((choice<0) || (choice>10)){
+                    slideDown();
+                    invalidChoiceMenu(timeinmilis_short);
+                } else{
+                    user.addMovieWRate(recommended_movieId, choice);
+                }
+
+                counter++;
+
+                System.out.println();
+            }
+        }
     }
 }
