@@ -1,2 +1,2 @@
 # flixguru
-Personalized Movie Recommender Engine
+Personalized Movie Recommender System
