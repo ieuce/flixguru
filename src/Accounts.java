@@ -25,4 +25,8 @@ public class Accounts {
         _accounts.add(user);
     }
 
+    public User get_User(String nickname){
+        return _accounts.stream().filter(entry -> entry.get_nickname().equals(nickname)).findFirst().get();
+    }
+
 }
